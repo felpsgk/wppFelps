@@ -131,121 +131,6 @@ client.on('message', async msg => {
 			// Replies with the same message
 			msg.reply(msg.body.slice(7));
 
-		} else if (msg.body.startsWith('!preview ')) {
-			const text = msg.body.slice(9);
-			msg.reply(text, null, { linkPreview: true });
-			
-		} else if (msg.body.startsWith('!desc ')) {
-			// Change the group description
-			let chat = await msg.getChat();
-			if (chat.isGroup) {
-				let newDescription = msg.body.slice(6);
-				chat.setDescription(newDescription);
-			} else {
-				msg.reply('This command can only be used in a group!');
-			}
-		} else if (msg.body === '!leave') {
-			// Leave the group
-			let chat = await msg.getChat();
-			if (chat.isGroup) {
-				chat.leave();
-			} else {
-				msg.reply('This command can only be used in a group!');
-			}
-		} else if (msg.body.startsWith('!join ')) {
-			const inviteCode = msg.body.split(' ')[1];
-			try {
-				await client.acceptInvite(inviteCode);
-				msg.reply('Joined the group!');
-			} catch (e) {
-				msg.reply('That invite code seems to be invalid.');
-			}
-		} else if (msg.body.startsWith('!addmembers')) {
-			const group = await msg.getChat();
-			const result = await group.addParticipants(['number1@c.us', 'number2@c.us', 'number3@c.us']);
-			/**
-			* The example of the {@link result} output:
-			*
-			* {
-			*   'number1@c.us': {
-			*     code: 200,
-			*     message: 'The participant was added successfully',
-			*     isInviteV4Sent: false
-			*   },
-			*   'number2@c.us': {
-			*     code: 403,
-			*     message: 'The participant can be added by sending private invitation only',
-			*     isInviteV4Sent: true
-			*   },
-			*   'number3@c.us': {
-			*     code: 404,
-			*     message: 'The phone number is not registered on WhatsApp',
-			*     isInviteV4Sent: false
-			*   }
-			* }
-			*
-			* For more usage examples:
-			* @see https://github.com/pedroslopez/whatsapp-web.js/pull/2344#usage-example1
-			*/
-			console.log(result);
-		} else if (msg.body === '!creategroup') {
-			const partitipantsToAdd = ['number1@c.us', 'number2@c.us', 'number3@c.us'];
-			const result = await client.createGroup('Group Title', partitipantsToAdd);
-			/**
-			* The example of the {@link result} output:
-			* {
-			*   title: 'Group Title',
-			*   gid: {
-			*     server: 'g.us',
-			*     user: '1111111111',
-			*     _serialized: '1111111111@g.us'
-			*   },
-			*   participants: {
-			*     'botNumber@c.us': {
-			*       statusCode: 200,
-			*       message: 'The participant was added successfully',
-			*       isGroupCreator: true,
-			*       isInviteV4Sent: false
-			*     },
-			*     'number1@c.us': {
-			*       statusCode: 200,
-			*       message: 'The participant was added successfully',
-			*       isGroupCreator: false,
-			*       isInviteV4Sent: false
-			*     },
-			*     'number2@c.us': {
-			*       statusCode: 403,
-			*       message: 'The participant can be added by sending private invitation only',
-			*       isGroupCreator: false,
-			*       isInviteV4Sent: true
-			*     },
-			*     'number3@c.us': {
-			*       statusCode: 404,
-			*       message: 'The phone number is not registered on WhatsApp',
-			*       isGroupCreator: false,
-			*       isInviteV4Sent: false
-			*     }
-			*   }
-			* }
-			*
-			* For more usage examples:
-			* @see https://github.com/pedroslopez/whatsapp-web.js/pull/2344#usage-example2
-			*/
-			console.log(result);
-		} else if (msg.body === '!groupinfo') {
-			let chat = await msg.getChat();
-			if (chat.isGroup) {
-				msg.reply(`
-                *Group Details*
-                Name: ${chat.name}
-                Description: ${chat.description}
-                Created At: ${chat.createdAt.toString()}
-                Created By: ${chat.owner.user}
-                Participant count: ${chat.participants.length}
-            `);
-			} else {
-				msg.reply('This command can only be used in a group!');
-			}
 		} else if (msg.body === '!chats') {
 			const chats = await client.getChats();
 			client.sendMessage(msg.from, `The bot has ${chats.length} chats open.`);
@@ -275,7 +160,23 @@ client.on('message', async msg => {
             Timestamp: ${quotedMsg.timestamp}
             Has Media? ${quotedMsg.hasMedia}
         `);
-		} else if (msg.body === '!resendmedia' && msg.hasQuotedMsg) {
+		} else if (msg.body === '!sendpoll') {
+			/** By default the poll is created as a single choice poll: */
+			await msg.reply(new Poll('Winter or Summer?', ['Winter', 'Summer']));
+			/** If you want to provide a multiple choice poll, add allowMultipleAnswers as true: */
+			await msg.reply(new Poll('Cats or Dogs?', ['Cats', 'Dogs'], { allowMultipleAnswers: true }));
+			/**
+			* You can provide a custom message secret, it can be used as a poll ID:
+			* @note It has to be a unique vector with a length of 32
+			*/
+			await msg.reply(
+				new Poll('Cats or Dogs?', ['Cats', 'Dogs'], {
+					messageSecret: [
+						1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+					]
+				})
+			);
+		} /* else if (msg.body === '!resendmedia' && msg.hasQuotedMsg) {
 			const quotedMsg = await msg.getQuotedMessage();
 			if (quotedMsg.hasMedia) {
 				const attachmentData = await quotedMsg.downloadMedia();
@@ -285,89 +186,11 @@ client.on('message', async msg => {
 				const audio = await quotedMsg.downloadMedia();
 				await client.sendMessage(msg.from, audio, { sendAudioAsVoice: true });
 			}
-		} else if (msg.body === '!isviewonce' && msg.hasQuotedMsg) {
-			const quotedMsg = await msg.getQuotedMessage();
-			if (quotedMsg.hasMedia) {
-				const media = await quotedMsg.downloadMedia();
-				await client.sendMessage(msg.from, media, { isViewOnce: true });
-			}
-		} else if (msg.body === '!location') {
-			// only latitude and longitude
-			await msg.reply(new Location(37.422, -122.084));
-			// location with name only
-			await msg.reply(new Location(37.422, -122.084, { name: 'Googleplex' }));
-			// location with address only
-			await msg.reply(new Location(37.422, -122.084, { address: '1600 Amphitheatre Pkwy, Mountain View, CA 94043, USA' }));
-			// location with name, address and url
-			await msg.reply(new Location(37.422, -122.084, { name: 'Googleplex', address: '1600 Amphitheatre Pkwy, Mountain View, CA 94043, USA', url: 'https://google.com' }));
-		} else if (msg.location) {
-			msg.reply(msg.location);
 		} else if (msg.body.startsWith('!status ')) {
 			const newStatus = msg.body.split(' ')[1];
 			await client.setStatus(newStatus);
 			msg.reply(`Status was updated to *${newStatus}*`);
-		} else if (msg.body === '!mentionUsers') {
-			const chat = await msg.getChat();
-			const userNumber = 'XXXXXXXXXX';
-			/**
-			* To mention one user you can pass user's ID to 'mentions' property as is,
-			* without wrapping it in Array, and a user's phone number to the message body:
-			*/
-			await chat.sendMessage(`Hi @${userNumber}`, {
-				mentions: userNumber + '@c.us'
-			});
-			// To mention a list of users:
-			await chat.sendMessage(`Hi @${userNumber}, @${userNumber}`, {
-				mentions: [userNumber + '@c.us', userNumber + '@c.us']
-			});
-		} else if (msg.body === '!mentionGroups') {
-			const chat = await msg.getChat();
-			const groupId = 'YYYYYYYYYY@g.us';
-			/**
-			* Sends clickable group mentions, the same as user mentions.
-			* When the mentions are clicked, it opens a chat with the mentioned group.
-			* The 'groupMentions.subject' can be custom
-			* 
-			* @note The user that does not participate in the mentioned group,
-			* will not be able to click on that mentioned group, the same if the group does not exist
-			*
-			* To mention one group:
-			*/
-			await chat.sendMessage(`Check the last message here: @${groupId}`, {
-				groupMentions: { subject: 'GroupSubject', id: groupId }
-			});
-			// To mention a list of groups:
-			await chat.sendMessage(`Check the last message in these groups: @${groupId}, @${groupId}`, {
-				groupMentions: [
-					{ subject: 'FirstGroup', id: groupId },
-					{ subject: 'SecondGroup', id: groupId }
-				]
-			});
-		} else if (msg.body === '!getGroupMentions') {
-			// To get group mentions from a message:
-			const groupId = 'ZZZZZZZZZZ@g.us';
-			const msg = await client.sendMessage('chatId', `Check the last message here: @${groupId}`, {
-				groupMentions: { subject: 'GroupSubject', id: groupId }
-			});
-			/** {@link groupMentions} is an array of `GroupChat` */
-			const groupMentions = await msg.getGroupMentions();
-			console.log(groupMentions);
-		} else if (msg.body === '!delete') {
-			if (msg.hasQuotedMsg) {
-				const quotedMsg = await msg.getQuotedMessage();
-				if (quotedMsg.fromMe) {
-					quotedMsg.delete(true);
-				} else {
-					msg.reply('I can only delete my own messages');
-				}
-			}
-		} else if (msg.body === '!pin') {
-			const chat = await msg.getChat();
-			await chat.pin();
-		} else if (msg.body === '!archive') {
-			const chat = await msg.getChat();
-			await chat.archive();
-		} else if (msg.body === '!mute') {
+		}else if (msg.body === '!mute') {
 			const chat = await msg.getChat();
 			// mute the chat for 20 seconds
 			const unmuteDate = new Date();
@@ -385,6 +208,10 @@ client.on('message', async msg => {
 			const chat = await msg.getChat();
 			// stops typing or recording in the chat
 			chat.clearState();
+		}
+		else if (msg.body === '!pin') {
+			const chat = await msg.getChat();
+			await chat.pin();
 		} else if (msg.body === '!jumpto') {
 			if (msg.hasQuotedMsg) {
 				const quotedMsg = await msg.getQuotedMessage();
@@ -401,22 +228,6 @@ client.on('message', async msg => {
 			client.sendMessage(msg.from, list);
 		} else if (msg.body === '!reaction') {
 			msg.react('👍');
-		} else if (msg.body === '!sendpoll') {
-			/** By default the poll is created as a single choice poll: */
-			await msg.reply(new Poll('Winter or Summer?', ['Winter', 'Summer']));
-			/** If you want to provide a multiple choice poll, add allowMultipleAnswers as true: */
-			await msg.reply(new Poll('Cats or Dogs?', ['Cats', 'Dogs'], { allowMultipleAnswers: true }));
-			/**
-			* You can provide a custom message secret, it can be used as a poll ID:
-			* @note It has to be a unique vector with a length of 32
-			*/
-			await msg.reply(
-				new Poll('Cats or Dogs?', ['Cats', 'Dogs'], {
-					messageSecret: [
-						1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-					]
-				})
-			);
 		} else if (msg.body === '!edit') {
 			if (msg.hasQuotedMsg) {
 				const quotedMsg = await msg.getQuotedMessage();
@@ -438,53 +249,12 @@ client.on('message', async msg => {
 		} else if (msg.body === '!removelabels') {
 			const chat = await msg.getChat();
 			await chat.changeLabels([]);
-		} else if (msg.body === '!approverequest') {
-			/**
-			* Presented an example for membership request approvals, the same examples are for the request rejections.
-			* To approve the membership request from a specific user:
-			*/
-			await client.approveGroupMembershipRequests(msg.from, { requesterIds: 'number@c.us' });
-			/** The same for execution on group object (no need to provide the group ID): */
-			const group = await msg.getChat();
-			await group.approveGroupMembershipRequests({ requesterIds: 'number@c.us' });
-			/** To approve several membership requests: */
-			const approval = await client.approveGroupMembershipRequests(msg.from, {
-				requesterIds: ['number1@c.us', 'number2@c.us']
-			});
-			/**
-			* The example of the {@link approval} output:
-			* [
-			*   {
-			*     requesterId: 'number1@c.us',
-			*     message: 'Rejected successfully'
-			*   },
-			*   {
-			*     requesterId: 'number2@c.us',
-			*     error: 404,
-			*     message: 'ParticipantRequestNotFoundError'
-			*   }
-			* ]
-			*
-			*/
-			console.log(approval);
-			/** To approve all the existing membership requests (simply don't provide any user IDs): */
-			await client.approveGroupMembershipRequests(msg.from);
-			/** To change the sleep value to 300 ms: */
-			await client.approveGroupMembershipRequests(msg.from, {
-				requesterIds: ['number1@c.us', 'number2@c.us'],
-				sleep: 300
-			});
-			/** To change the sleep value to random value between 100 and 300 ms: */
-			await client.approveGroupMembershipRequests(msg.from, {
-				requesterIds: ['number1@c.us', 'number2@c.us'],
-				sleep: [100, 300]
-			});
-			/** To explicitly disable the sleep: */
-			await client.approveGroupMembershipRequests(msg.from, {
-				requesterIds: ['number1@c.us', 'number2@c.us'],
-				sleep: null
-			});
-		} else if (msg.body === '!pinmsg') {
+		}else if (msg.body === '!statuses') {
+			const statuses = await client.getBroadcasts();
+			console.log(statuses);
+			const chat = await statuses[0]?.getChat(); // Get user chat of a first status
+			console.log(chat);
+		}*/ else if (msg.body === '!pinmsg') {
 			/**
 			* Pins a message in a chat, a method takes a number in seconds for the message to be pinned.
 			* WhatsApp default values for duration to pass to the method are:
@@ -495,32 +265,13 @@ client.on('message', async msg => {
 			*/
 			const result = await msg.pin(60); // Will pin a message for 1 minute
 			console.log(result); // True if the operation completed successfully, false otherwise
-		} else if (msg.body === '!howManyConnections') {
-			/**
-			* Get user device count by ID
-			* Each WaWeb Connection counts as one device, and the phone (if exists) counts as one
-			* So for a non-enterprise user with one WaWeb connection it should return "2"
-			*/
-			let deviceCount = await client.getContactDeviceCount(msg.from);
-			await msg.reply(`You have *${deviceCount}* devices connected`);
-		} else if (msg.body === '!syncHistory') {
-			const isSynced = await client.syncHistory(msg.from);
-			// Or through the Chat object:
-			// const chat = await client.getChatById(msg.from);
-			// const isSynced = await chat.syncHistory();
-
-			await msg.reply(isSynced ? 'Historical chat is syncing..' : 'There is no historical chat to sync.');
-		} else if (msg.body === '!statuses') {
-			const statuses = await client.getBroadcasts();
-			console.log(statuses);
-			const chat = await statuses[0]?.getChat(); // Get user chat of a first status
-			console.log(chat);
 		}
 	}
 });
 
 client.on('message_create', async (msg) => {
 	// Fired on all message creations, including your own
+	let chat = await msg.getChat();
 	if (msg.fromMe) {
 		// do stuff here
 	}
@@ -533,6 +284,9 @@ client.on('message_create', async (msg) => {
 			const result = await pinnedMsg.unpin();
 			console.log(result); // True if the operation completed successfully, false otherwise
 		}
+	} else if (msg.fromMe && msg.body.startsWith('Mor')) {
+		sleep(1000);
+		chat.sendMessage('Te amo');
 	}
 });
 
