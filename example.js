@@ -36,6 +36,29 @@ async function getPiada() {
     return null; // Retorna null em caso de erro
   }
 }
+var vlrmin;
+var vlrmax;
+const extractNumber = (message) => {
+  const parts = message.split(" ");
+  if (parts.length > 1) {
+    return parts[1].trim();
+    // Retorna o segundo elemento, que é o número
+  }
+  return null;
+};
+async function getPlayers(minprice, maxprice) {
+  try {
+    // Faz a requisição para a nova API de scraping de jogadores
+    const response = await fetch(
+      `http://localhost:3005/jogadores?minprice=${minprice}&maxprice=${maxprice}`
+    );
+    const data = await response.text(); // Usamos text() pois a resposta é uma string simples
+    return data; // Retorna a lista de jogadores e seus preços
+  } catch (error) {
+    console.error("Erro ao buscar jogadores", error);
+    return null; // Retorna null em caso de erro
+  }
+}
 
 // client initialize does not finish a at ready now.
 client.initialize();
@@ -178,13 +201,34 @@ client.on("message_create", async (msg) => {
     sleep(1000);
     chat.sendMessage("Te amo");
   } else if (msg.fromMe && msg.body === "!piada") {
-    sleep(1000);
+    sleep(3000);
     getPiada()
       .then((piada) => {
         chat.sendMessage("*piada das boas*\n\n" + piada);
       })
       .catch((error) => {
         chat.sendMessage("Erro ao buscar piada" + error);
+      });
+  } else if (msg.fromMe && msg.body === "!fifa" ) {
+    //envia fifa pro parcero
+    chat.sendMessage(
+      "Bot *FIFA UT* do Felps\nQual valor mínimo quer buscar?\n\n_Responda com !vlrmin ou não funcionará. Exemplo: '!vlrmin 4000'_"
+    );
+  } else if (msg.fromMe && msg.body.startsWith("!vlrmin ")) {
+    //envia fifa pro parcero
+    vlrmin = extractNumber(msg.body);
+    chat.sendMessage(
+      "Bot *FIFA UT* do Felps\nQual valor máximo quer buscar?\n\n_Responda com !vlrmax ou não funcionará. Exemplo: '!vlrmax 15000'_"
+    );
+  } else if (msg.fromMe && msg.body.startsWith("!vlrmax ")) {
+    //envia fifa pro parcero
+    vlrmax = extractNumber(msg.body);
+    getPlayers(vlrmin, vlrmax)
+      .then((players) => {
+        chat.sendMessage("*Jogadores e Preços*\n\n" + players);
+      })
+      .catch((error) => {
+        chat.sendMessage("Erro ao buscar jogadores: " + error);
       });
   }
 });
@@ -210,13 +254,34 @@ client.on("message", async (msg) => {
   } else if (msg.body === "!piada") {
     //envia piada pro parcero
     msg.react("😂");
-    sleep(1000);
+    sleep(3000);
     getPiada()
       .then((piada) => {
         chat.sendMessage("*piada das boas*\n\n" + piada);
       })
       .catch((error) => {
         chat.sendMessage("Erro ao buscar piada" + error);
+      });
+  } else if (msg.body === "!fifa" && !chat.isGroup) {
+    //envia fifa pro parcero
+    msg.reply(
+      "Bot *FIFA UT* do Felps\nQual valor mínimo quer buscar?\n\n_Responda com !vlrmin ou não funcionará. Exemplo: '!vlrmin 4000'_"
+    );
+  } else if (msg.body.startsWith("!vlrmin ") && !chat.isGroup) {
+    //envia fifa pro parcero
+    vlrmin = extractNumber(msg.body);
+    msg.reply(
+      "Bot *FIFA UT* do Felps\nQual valor máximo quer buscar?\n\n_Responda com !vlrmax ou não funcionará. Exemplo: '!vlrmax 15000'_"
+    );
+  } else if (msg.body.startsWith("!vlrmax ") && !chat.isGroup) {
+    //envia fifa pro parcero
+    vlrmax = extractNumber(msg.body);
+    getPlayers(vlrmin, vlrmax)
+      .then((players) => {
+        msg.reply("*Jogadores e Preços*\n\n" + players);
+      })
+      .catch((error) => {
+        msg.reply("Erro ao buscar jogadores: " + error);
       });
   } else if (msg.body.startsWith("repete ") && !chat.isGroup) {
     msg.reply(msg.body.slice(7));
