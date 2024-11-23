@@ -50,7 +50,7 @@ async function getPlayers(minprice, maxprice) {
   try {
     // Faz a requisição para a nova API de scraping de jogadores
     const response = await fetch(
-      `http://localhost:3005/jogadores?minprice=${minprice}&maxprice=${maxprice}`
+      `http://192.168.3.57:3005/jogadores?minprice=${minprice}&maxprice=${maxprice}`
     );
     const data = await response.text(); // Usamos text() pois a resposta é uma string simples
     return data; // Retorna a lista de jogadores e seus preços
