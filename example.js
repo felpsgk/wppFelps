@@ -13,6 +13,18 @@ const client = new Client({
     }
 });
 
+// Rota para fornecer o QR Code em formato JSON
+app.get('/qrcode', (req, res) => {
+    if (!qrCodeData) {
+        res.json({ status: 'loading', message: 'Carregando sistema!' });
+    } else if (qrCodeData === 'READY') {
+        res.json({ status: 'ready', message: 'Já funcional...' });
+    } else {
+        res.json({ status: 'waiting', qrCode: qrCodeData });
+    }
+});
+	
+
 // client initialize does not finish a at ready now.
 client.initialize();
 
