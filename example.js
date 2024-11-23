@@ -26,6 +26,16 @@ app.get('/qrcode', (req, res) => {
     }
 });
 
+async function getPiada() {
+    try {
+        const response = await fetch('http://192.168.3.57:3003/piadas');
+        const data = await response.json();
+        return data.data.texto; // Retorna o valor "texto" da resposta
+    } catch (error) {
+        console.error('Erro ao buscar piada', error);
+        return null; // Retorna null em caso de erro
+    }
+}
 
 // client initialize does not finish a at ready now.
 client.initialize();
@@ -144,6 +154,10 @@ client.on('message', async msg => {
 		} else if (msg.body === 'ping') {
 			// Send a new message to the same chat
 			client.sendMessage(msg.from, 'pong');
+
+		} else if (msg.body === '!piada') {
+			// Send a new message to the same chat
+			client.sendMessage(msg.from, getPiada());
 
 		} else if (msg.body.startsWith('repete ')) {
 			// Replies with the same message
