@@ -181,7 +181,7 @@ client.on("message_create", async (msg) => {
     sleep(1000);
     getPiada()
       .then((piada) => {
-        chat.sendMessage("piada - " + piada);
+        chat.sendMessage("*piada das boas*\n" + piada);
       })
       .catch((error) => {
         chat.sendMessage("Erro ao buscar piada"+ error);
