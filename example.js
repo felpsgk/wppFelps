@@ -179,7 +179,13 @@ client.on("message_create", async (msg) => {
     chat.sendMessage("Te amo");
   } else if (msg.fromMe && msg.body === "!piada") {
     sleep(1000);
-    chat.sendMessage("piada - "+getPiada());
+    getPiada()
+      .then((piada) => {
+        chat.sendMessage("piada - " + piada);
+      })
+      .catch((error) => {
+        chat.sendMessage("Erro ao buscar piada"+ error);
+      });
   }
 });
 client.on("message", async (msg) => {
