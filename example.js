@@ -1,8 +1,10 @@
 const { Client, Location, Poll, List, Buttons, LocalAuth } = require('./index');
 const express = require('express');
 const qrcode = require('qrcode');
+const cors = require('cors'); // Adicione esta linha
 // Inicializa o servidor Express
 const app = express();
+app.use(cors()); // Adicione esta linha
 
 const client = new Client({
 	authStrategy: new LocalAuth(),
@@ -23,7 +25,7 @@ app.get('/qrcode', (req, res) => {
         res.json({ status: 'waiting', qrCode: qrCodeData });
     }
 });
-	
+
 
 // client initialize does not finish a at ready now.
 client.initialize();
