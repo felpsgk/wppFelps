@@ -7,6 +7,10 @@ const app = express();
 const client = new Client({
 	authStrategy: new LocalAuth(),
 	// proxyAuthentication: { username: 'username', password: 'password' },
+	puppeteer: { 
+        args: ['--no-sandbox', '--disabled-setupid-sandbox'],
+        headless: true,
+    }
 });
 
 // client initialize does not finish a at ready now.
