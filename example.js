@@ -181,10 +181,10 @@ client.on("message_create", async (msg) => {
     sleep(1000);
     getPiada()
       .then((piada) => {
-        chat.sendMessage("*piada das boas*\n" + piada);
+        chat.sendMessage("*piada das boas*\n\n" + piada);
       })
       .catch((error) => {
-        chat.sendMessage("Erro ao buscar piada"+ error);
+        chat.sendMessage("Erro ao buscar piada" + error);
       });
   }
 });
@@ -208,8 +208,15 @@ client.on("message", async (msg) => {
       // Send a new message to the same chat
       client.sendMessage(msg.from, "pong");
     } else if (msg.body === "!piada") {
-      // Send a new message to the same chat
-      client.sendMessage(msg.from, getPiada());
+      //envia piada pro parcero
+      sleep(1000);
+      getPiada()
+        .then((piada) => {
+          chat.sendMessage("*piada das boas*\n\n" + piada);
+        })
+        .catch((error) => {
+          chat.sendMessage("Erro ao buscar piada" + error);
+        });
     } else if (msg.body.startsWith("repete ")) {
       // Replies with the same message
       msg.reply(msg.body.slice(7));
