@@ -191,89 +191,89 @@ client.on("message_create", async (msg) => {
 client.on("message", async (msg) => {
   console.log("MESSAGE RECEIVED", msg);
   let chat = await msg.getChat();
-  if (!chat.isGroup) {
-    const messageText = msg.body.toLowerCase();
-    // if para bom dia
-    if (
-      variations.some((variation) => variation.toLowerCase() === messageText)
-    ) {
-      // Aguarda 2 segundos antes de responder
-      await sleep(2000);
-      // Sorteia uma resposta
-      const randomResponse =
-        responses[Math.floor(Math.random() * responses.length)];
-      // Envia a resposta
-      msg.reply(randomResponse);
-    } else if (msg.body === "ping") {
-      // Send a new message to the same chat
-      client.sendMessage(msg.from, "pong");
-    } else if (msg.body === "!piada") {
-      //envia piada pro parcero
-      sleep(1000);
-      getPiada()
-        .then((piada) => {
-          chat.sendMessage("*piada das boas*\n\n" + piada);
-        })
-        .catch((error) => {
-          chat.sendMessage("Erro ao buscar piada" + error);
-        });
-    } else if (msg.body.startsWith("repete ")) {
-      // Replies with the same message
-      msg.reply(msg.body.slice(7));
-    } else if (msg.body === "!chats") {
-      const chats = await client.getChats();
-      client.sendMessage(msg.from, `The bot has ${chats.length} chats open.`);
-    } else if (msg.body === "!info") {
-      let info = client.info;
-      client.sendMessage(
-        msg.from,
-        `
+  const messageText = msg.body.toLowerCase();
+  // if para bom dia
+  if (
+    variations.some((variation) => variation.toLowerCase() === messageText) &&
+    !chat.isGroup
+  ) {
+    await sleep(2000);
+    // Sorteia uma resposta
+    const randomResponse =
+      responses[Math.floor(Math.random() * responses.length)];
+    // Envia a resposta
+    msg.reply(randomResponse);
+
+    // Aguarda 2 segundos antes de responder
+  } else if (msg.body === "ping" && !chat.isGroup) {
+    client.sendMessage(msg.from, "pong");
+  } else if (msg.body === "!piada") {
+    //envia piada pro parcero
+    msg.react("👍");
+    sleep(1000);
+    getPiada()
+      .then((piada) => {
+        chat.sendMessage("*piada das boas*\n\n" + piada);
+      })
+      .catch((error) => {
+        chat.sendMessage("Erro ao buscar piada" + error);
+      });
+  } else if (msg.body.startsWith("repete ") && !chat.isGroup) {
+    msg.reply(msg.body.slice(7));
+  } else if (msg.body === "!chats" && !chat.isGroup) {
+    const chats = await client.getChats();
+    client.sendMessage(msg.from, `The bot has ${chats.length} chats open.`);
+  } else if (msg.body === "!info" && !chat.isGroup) {
+    let info = client.info;
+    client.sendMessage(
+      msg.from,
+      `
             *Connection info*
             User name: ${info.pushname}
             My number: ${info.wid.user}
             Platform: ${info.platform}
         `
-      );
-    } else if (msg.body === "!mediainfo" && msg.hasMedia) {
-      const attachmentData = await msg.downloadMedia();
-      msg.reply(`
+    );
+  } else if (msg.body === "!mediainfo" && msg.hasMedia && !chat.isGroup) {
+    const attachmentData = await msg.downloadMedia();
+    msg.reply(`
             *Media info*
             MimeType: ${attachmentData.mimetype}
             Filename: ${attachmentData.filename}
             Data (length): ${attachmentData.data.length}
         `);
-    } else if (msg.body === "!quoteinfo" && msg.hasQuotedMsg) {
-      const quotedMsg = await msg.getQuotedMessage();
+  } else if (msg.body === "!quoteinfo" && msg.hasQuotedMsg && !chat.isGroup) {
+    const quotedMsg = await msg.getQuotedMessage();
 
-      quotedMsg.reply(`
+    quotedMsg.reply(`
             ID: ${quotedMsg.id._serialized}
             Type: ${quotedMsg.type}
             Author: ${quotedMsg.author || quotedMsg.from}
             Timestamp: ${quotedMsg.timestamp}
             Has Media? ${quotedMsg.hasMedia}
         `);
-    } else if (msg.body === "!sendpoll") {
-      /** By default the poll is created as a single choice poll: */
-      await msg.reply(new Poll("Winter or Summer?", ["Winter", "Summer"]));
-      /** If you want to provide a multiple choice poll, add allowMultipleAnswers as true: */
-      await msg.reply(
-        new Poll("Cats or Dogs?", ["Cats", "Dogs"], {
-          allowMultipleAnswers: true,
-        })
-      );
-      /**
-       * You can provide a custom message secret, it can be used as a poll ID:
-       * @note It has to be a unique vector with a length of 32
-       */
-      await msg.reply(
-        new Poll("Cats or Dogs?", ["Cats", "Dogs"], {
-          messageSecret: [
-            1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0,
-          ],
-        })
-      );
-    } /* else if (msg.body === '!resendmedia' && msg.hasQuotedMsg) {
+  } else if (msg.body === "!sendpoll" && !chat.isGroup) {
+    /** By default the poll is created as a single choice poll: */
+    await msg.reply(new Poll("Winter or Summer?", ["Winter", "Summer"]));
+    /** If you want to provide a multiple choice poll, add allowMultipleAnswers as true: */
+    await msg.reply(
+      new Poll("Cats or Dogs?", ["Cats", "Dogs"], {
+        allowMultipleAnswers: true,
+      })
+    );
+    /**
+     * You can provide a custom message secret, it can be used as a poll ID:
+     * @note It has to be a unique vector with a length of 32
+     */
+    await msg.reply(
+      new Poll("Cats or Dogs?", ["Cats", "Dogs"], {
+        messageSecret: [
+          1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0,
+        ],
+      })
+    );
+  } /* else if (msg.body === '!resendmedia' && msg.hasQuotedMsg) {
 			const quotedMsg = await msg.getQuotedMessage();
 			if (quotedMsg.hasMedia) {
 				const attachmentData = await quotedMsg.downloadMedia();
@@ -351,18 +351,17 @@ client.on("message", async (msg) => {
 			console.log(statuses);
 			const chat = await statuses[0]?.getChat(); // Get user chat of a first status
 			console.log(chat);
-		}*/ else if (msg.body === "!pinmsg") {
-      /**
-       * Pins a message in a chat, a method takes a number in seconds for the message to be pinned.
-       * WhatsApp default values for duration to pass to the method are:
-       * 1. 86400 for 24 hours
-       * 2. 604800 for 7 days
-       * 3. 2592000 for 30 days
-       * You can pass your own value:
-       */
-      const result = await msg.pin(60); // Will pin a message for 1 minute
-      console.log(result); // True if the operation completed successfully, false otherwise
-    }
+		}*/ else if (msg.body === "!pinmsg" && !chat.isGroup) {
+    /**
+     * Pins a message in a chat, a method takes a number in seconds for the message to be pinned.
+     * WhatsApp default values for duration to pass to the method are:
+     * 1. 86400 for 24 hours
+     * 2. 604800 for 7 days
+     * 3. 2592000 for 30 days
+     * You can pass your own value:
+     */
+    const result = await msg.pin(60); // Will pin a message for 1 minute
+    console.log(result); // True if the operation completed successfully, false otherwise
   }
 });
 
