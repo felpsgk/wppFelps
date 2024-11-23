@@ -209,7 +209,7 @@ client.on("message", async (msg) => {
     client.sendMessage(msg.from, "pong");
   } else if (msg.body === "!piada") {
     //envia piada pro parcero
-    msg.react("👍");
+    msg.react("😂");
     sleep(1000);
     getPiada()
       .then((piada) => {
