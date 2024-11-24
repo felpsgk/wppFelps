@@ -217,17 +217,23 @@ client.on("message_create", async (msg) => {
       console.log(result); // True if the operation completed successfully, false otherwise
     }
   } else if (msg.fromMe && msg.body.startsWith("Mor")) {
-    await sleep(1000);
+	chat.sendStateTyping();
+    await sleep(4000);
+	chat.clearState();
     chat.sendMessage("Te amo");
   } else if (msg.fromMe && msg.body.startsWith("!funções")) {
-    await sleep(1000);
+	chat.sendStateTyping();
+    await sleep(4000);
+	chat.clearState();
     chat.sendMessage("*Bot Felps em ação!*");
     chat.sendMessage("Você pode tentar os comandos:");
     chat.sendMessage(
       "!piada - para ler umas piadas boas\n!fifa - para buscar jogadores em uma faixa de preço\n!build - para encontrar a build do seu campeão favorito\n"
     );
   } else if (msg.fromMe && msg.body === "!piada") {
+	chat.sendStateTyping();
     await sleep(3000);
+	chat.clearState();
     getPiada()
       .then((piada) => {
         chat.sendMessage("*piada das boas*\n\n" + piada);
@@ -236,20 +242,26 @@ client.on("message_create", async (msg) => {
         chat.sendMessage("Erro ao buscar piada" + error);
       });
   } else if (msg.fromMe && msg.body === "!fifa") {
-    await sleep(3000);
+	chat.sendStateTyping();
+    await sleep(4000);
+	chat.clearState();
     //envia fifa pro parcero
     chat.sendMessage(
       "Bot *FIFA UT* do Felps\nQual valor mínimo quer buscar?\n\n_Responda com !vlrmin ou não funcionará. Exemplo: '!vlrmin 4000'_"
     );
   } else if (msg.fromMe && msg.body.startsWith("!vlrmin ")) {
-    await sleep(3000);
+	chat.sendStateTyping();
+    await sleep(4000);
+	chat.clearState();
     //envia fifa pro parcero
     vlrmin = extractNumber(msg.body);
     chat.sendMessage(
       "Bot *FIFA UT* do Felps\nQual valor máximo quer buscar?\n\n_Responda com !vlrmax ou não funcionará. Exemplo: '!vlrmax 15000'_"
     );
   } else if (msg.fromMe && msg.body.startsWith("!vlrmax ")) {
-    await sleep(3000);
+	chat.sendStateTyping();
+    await sleep(4000);
+	chat.clearState();
     //envia fifa pro parcero
     vlrmax = extractNumber(msg.body);
     getPlayers(vlrmin, vlrmax)
@@ -260,7 +272,9 @@ client.on("message_create", async (msg) => {
         chat.sendMessage("Erro ao buscar jogadores: " + error);
       });
   } else if (msg.fromMe && msg.body.startsWith("!build ")) {
-    await sleep(3000);
+	chat.sendStateTyping();
+    await sleep(4000);
+	chat.clearState();
     const champion = extractChampionName(msg.body);
     if (champion) {
       getBuild(champion)
@@ -288,7 +302,9 @@ client.on("message", async (msg) => {
     variations.some((variation) => variation.toLowerCase() === messageText) &&
     !chat.isGroup
   ) {
-    await sleep(2000);
+	chat.sendStateTyping();
+    await sleep(2300);
+	chat.clearState();
     // Sorteia uma resposta
     const randomResponse =
       responses[Math.floor(Math.random() * responses.length)];
@@ -297,11 +313,16 @@ client.on("message", async (msg) => {
 
     // Aguarda 2 segundos antes de responder
   } else if (msg.body === "ping" && !chat.isGroup) {
+	chat.sendStateTyping();
+    await sleep(700);
+	chat.clearState();
     client.sendMessage(msg.from, "pong");
   } else if (msg.body === "!piada") {
     //envia piada pro parcero
     msg.react("😂");
-    await sleep(3000);
+	chat.sendStateTyping();
+    await sleep(3500);
+	chat.clearState();
     getPiada()
       .then((piada) => {
         chat.sendMessage("*piada das boas*\n\n" + piada);
@@ -310,8 +331,10 @@ client.on("message", async (msg) => {
         chat.sendMessage("Erro ao buscar piada" + error);
       });
   } else if (msg.body.startsWith("!build ") && !chat.isGroup) {
-    await sleep(3000);
     const champion = extractChampionName(msg.body);
+	chat.sendStateTyping();
+    await sleep(5000);
+	chat.clearState();
     if (champion) {
       getBuild(champion.toLowerCase())
         .then((build) => {
@@ -329,23 +352,41 @@ client.on("message", async (msg) => {
     }
   } else if (msg.body === "!funções" && !chat.isGroup) {
     //envia fifa pro parcero
+	chat.sendStateTyping();
+    await sleep(1000);
+	chat.clearState();
     msg.reply("*Bot Felps em ação!*");
+	chat.sendStateTyping();
+    await sleep(2000);
+	chat.clearState();
     msg.reply("Você pode tentar os comandos:");
+	chat.sendStateTyping();
+    await sleep(3000);
+	chat.clearState();
     msg.reply(
       "!piada - para ler umas piadas boas\n!fifa - para buscar jogadores em uma faixa de preço\n!build - para encontrar a build do seu campeão favorito\n"
     );
   } else if (msg.body === "!fifa" && !chat.isGroup) {
     //envia fifa pro parcero
+	chat.sendStateTyping();
+    await sleep(2000);
+	chat.clearState();
     msg.reply(
       "Bot *FIFA UT* do Felps\nQual valor mínimo quer buscar?\n\n_Responda com !vlrmin ou não funcionará. Exemplo: '!vlrmin 4000'_"
     );
   } else if (msg.body.startsWith("!vlrmin ") && !chat.isGroup) {
     //envia fifa pro parcero
+	chat.sendStateTyping();
+    await sleep(2000);
+	chat.clearState();
     vlrmin = extractNumber(msg.body);
     msg.reply(
       "Bot *FIFA UT* do Felps\nQual valor máximo quer buscar?\n\n_Responda com !vlrmax ou não funcionará. Exemplo: '!vlrmax 15000'_"
     );
   } else if (msg.body.startsWith("!vlrmax ") && !chat.isGroup) {
+	chat.sendStateTyping();
+    await sleep(4000);
+	chat.clearState();
     //envia fifa pro parcero
     vlrmax = extractNumber(msg.body);
     getPlayers(vlrmin, vlrmax)
@@ -356,8 +397,14 @@ client.on("message", async (msg) => {
         msg.reply("Erro ao buscar jogadores: " + error);
       });
   } else if (msg.body.startsWith("repete ") && !chat.isGroup) {
+	chat.sendStateTyping();
+    await sleep(4000);
+	chat.clearState();
     msg.reply(msg.body.slice(7));
   } else if (msg.body === "!chats" && !chat.isGroup) {
+	chat.sendStateTyping();
+    await sleep(3000);
+	chat.clearState();
     const chats = await client.getChats();
     client.sendMessage(msg.from, `The bot has ${chats.length} chats open.`);
   } else if (msg.body === "!info" && !chat.isGroup) {
