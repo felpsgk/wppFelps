@@ -210,17 +210,20 @@ client.on("message_create", async (msg) => {
         chat.sendMessage("Erro ao buscar piada" + error);
       });
   } else if (msg.fromMe && msg.body === "!fifa" ) {
+    sleep(3000);
     //envia fifa pro parcero
     chat.sendMessage(
       "Bot *FIFA UT* do Felps\nQual valor mínimo quer buscar?\n\n_Responda com !vlrmin ou não funcionará. Exemplo: '!vlrmin 4000'_"
     );
   } else if (msg.fromMe && msg.body.startsWith("!vlrmin ")) {
+    sleep(3000);
     //envia fifa pro parcero
     vlrmin = extractNumber(msg.body);
     chat.sendMessage(
       "Bot *FIFA UT* do Felps\nQual valor máximo quer buscar?\n\n_Responda com !vlrmax ou não funcionará. Exemplo: '!vlrmax 15000'_"
     );
   } else if (msg.fromMe && msg.body.startsWith("!vlrmax ")) {
+    sleep(3000);
     //envia fifa pro parcero
     vlrmax = extractNumber(msg.body);
     getPlayers(vlrmin, vlrmax)
