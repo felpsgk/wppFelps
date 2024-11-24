@@ -60,6 +60,25 @@ async function getPlayers(minprice, maxprice) {
   }
 }
 
+const extractChampionName = (message) => {
+  const parts = message.split(" ");
+  if (parts.length > 1) {
+    return parts.slice(1).join(" ").trim(); // Retorna o nome do campeão
+  }
+  return null;
+};
+async function getBuild(championName) {
+  try {
+    const response = await fetch(
+      `http://192.168.3.57:3006/build/${championName}`
+    );
+    const data = await response.text(); // Usamos text() pois a resposta é uma string simples
+    return data; // Retorna a lista de itens
+  } catch (error) {
+    console.error("Erro ao buscar build", error);
+    return null; // Retorna null em caso de erro
+  }
+}
 // client initialize does not finish a at ready now.
 client.initialize();
 
@@ -209,7 +228,7 @@ client.on("message_create", async (msg) => {
       .catch((error) => {
         chat.sendMessage("Erro ao buscar piada" + error);
       });
-  } else if (msg.fromMe && msg.body === "!fifa" ) {
+  } else if (msg.fromMe && msg.body === "!fifa") {
     sleep(3000);
     //envia fifa pro parcero
     chat.sendMessage(
@@ -233,6 +252,24 @@ client.on("message_create", async (msg) => {
       .catch((error) => {
         chat.sendMessage("Erro ao buscar jogadores: " + error);
       });
+  } else if (msg.fromMe && msg.body.startsWith("!build ")) {
+    sleep(3000);
+    const champion = extractChampionName(msg.body);
+    if (champion) {
+      getBuild(champion)
+        .then((build) => {
+          chat.sendMessage(
+            `Bot *Build LOL* do Felps\nAqui vai uma build de ${champion}:\n\n${build}`
+          );
+        })
+        .catch((error) => {
+          chat.sendMessage("Erro ao buscar build: " + error);
+        });
+    } else {
+      chat.sendMessage(
+        "Não foi possível extrair o nome do campeão. Por favor, tente novamente."
+      );
+    }
   }
 });
 client.on("message", async (msg) => {
@@ -265,6 +302,24 @@ client.on("message", async (msg) => {
       .catch((error) => {
         chat.sendMessage("Erro ao buscar piada" + error);
       });
+  } else if (msg.body.startsWith("!build ") && !chat.isGroup) {
+    sleep(3000);
+    const champion = extractChampionName(msg.body);
+    if (champion) {
+      getBuild(champion.toLowerCase())
+        .then((build) => {
+          chat.sendMessage(
+            `Bot *Build LOL* do Felps\nAqui vai uma build de ${champion}:\n\n${build}`
+          );
+        })
+        .catch((error) => {
+          chat.sendMessage("Erro ao buscar build: " + error);
+        });
+    } else {
+      chat.sendMessage(
+        "Não foi possível extrair o nome do campeão. Por favor, tente novamente."
+      );
+    }
   } else if (msg.body === "!fifa" && !chat.isGroup) {
     //envia fifa pro parcero
     msg.reply(
