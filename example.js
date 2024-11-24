@@ -217,17 +217,17 @@ client.on("message_create", async (msg) => {
       console.log(result); // True if the operation completed successfully, false otherwise
     }
   } else if (msg.fromMe && msg.body.startsWith("Mor")) {
-    sleep(1000);
+    await sleep(1000);
     chat.sendMessage("Te amo");
   } else if (msg.fromMe && msg.body.startsWith("!funções")) {
-    sleep(1000);
+    await sleep(1000);
     chat.sendMessage("*Bot Felps em ação!*");
     chat.sendMessage("Você pode tentar os comandos:");
     chat.sendMessage(
       "!piada - para ler umas piadas boas\n!fifa - para buscar jogadores em uma faixa de preço\n!build - para encontrar a build do seu campeão favorito\n"
     );
   } else if (msg.fromMe && msg.body === "!piada") {
-    sleep(3000);
+    await sleep(3000);
     getPiada()
       .then((piada) => {
         chat.sendMessage("*piada das boas*\n\n" + piada);
@@ -236,20 +236,20 @@ client.on("message_create", async (msg) => {
         chat.sendMessage("Erro ao buscar piada" + error);
       });
   } else if (msg.fromMe && msg.body === "!fifa") {
-    sleep(3000);
+    await sleep(3000);
     //envia fifa pro parcero
     chat.sendMessage(
       "Bot *FIFA UT* do Felps\nQual valor mínimo quer buscar?\n\n_Responda com !vlrmin ou não funcionará. Exemplo: '!vlrmin 4000'_"
     );
   } else if (msg.fromMe && msg.body.startsWith("!vlrmin ")) {
-    sleep(3000);
+    await sleep(3000);
     //envia fifa pro parcero
     vlrmin = extractNumber(msg.body);
     chat.sendMessage(
       "Bot *FIFA UT* do Felps\nQual valor máximo quer buscar?\n\n_Responda com !vlrmax ou não funcionará. Exemplo: '!vlrmax 15000'_"
     );
   } else if (msg.fromMe && msg.body.startsWith("!vlrmax ")) {
-    sleep(3000);
+    await sleep(3000);
     //envia fifa pro parcero
     vlrmax = extractNumber(msg.body);
     getPlayers(vlrmin, vlrmax)
@@ -260,7 +260,7 @@ client.on("message_create", async (msg) => {
         chat.sendMessage("Erro ao buscar jogadores: " + error);
       });
   } else if (msg.fromMe && msg.body.startsWith("!build ")) {
-    sleep(3000);
+    await sleep(3000);
     const champion = extractChampionName(msg.body);
     if (champion) {
       getBuild(champion)
@@ -301,7 +301,7 @@ client.on("message", async (msg) => {
   } else if (msg.body === "!piada") {
     //envia piada pro parcero
     msg.react("😂");
-    sleep(3000);
+    await sleep(3000);
     getPiada()
       .then((piada) => {
         chat.sendMessage("*piada das boas*\n\n" + piada);
@@ -310,7 +310,7 @@ client.on("message", async (msg) => {
         chat.sendMessage("Erro ao buscar piada" + error);
       });
   } else if (msg.body.startsWith("!build ") && !chat.isGroup) {
-    sleep(3000);
+    await sleep(3000);
     const champion = extractChampionName(msg.body);
     if (champion) {
       getBuild(champion.toLowerCase())
