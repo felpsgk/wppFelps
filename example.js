@@ -219,6 +219,13 @@ client.on("message_create", async (msg) => {
   } else if (msg.fromMe && msg.body.startsWith("Mor")) {
     sleep(1000);
     chat.sendMessage("Te amo");
+  } else if (msg.fromMe && msg.body.startsWith("!funções")) {
+    sleep(1000);
+    chat.sendMessage("*Bot Felps em ação!*");
+    chat.sendMessage("Você pode tentar os comandos:");
+    chat.sendMessage(
+      "!piada - para ler umas piadas boas\n!fifa - para buscar jogadores em uma faixa de preço\n!build - para encontrar a build do seu campeão favorito\n"
+    );
   } else if (msg.fromMe && msg.body === "!piada") {
     sleep(3000);
     getPiada()
@@ -320,6 +327,13 @@ client.on("message", async (msg) => {
         "Não foi possível extrair o nome do campeão. Por favor, tente novamente."
       );
     }
+  } else if (msg.body === "!funções" && !chat.isGroup) {
+    //envia fifa pro parcero
+    msg.reply("*Bot Felps em ação!*");
+    msg.reply("Você pode tentar os comandos:");
+    msg.reply(
+      "!piada - para ler umas piadas boas\n!fifa - para buscar jogadores em uma faixa de preço\n!build - para encontrar a build do seu campeão favorito\n"
+    );
   } else if (msg.body === "!fifa" && !chat.isGroup) {
     //envia fifa pro parcero
     msg.reply(
